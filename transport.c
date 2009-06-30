@@ -196,7 +196,7 @@ static struct ref *get_refs_via_rsync(struct transport *transport, int for_push)
 	insert_packed_refs(temp_dir.buf, &tail);
 	strbuf_setlen(&temp_dir, temp_dir_len);
 
-	if (remove_dir_recursively(&temp_dir, 0))
+	if (remove_dir_recursively(&temp_dir, 0, 0))
 		warning ("Error removing temporary directory %s.",
 				temp_dir.buf);
 
@@ -342,7 +342,7 @@ static int rsync_transport_push(struct transport *transport,
 		result = error("Could not push to %s",
 				rsync_url(transport->url));
 
-	if (remove_dir_recursively(&temp_dir, 0))
+	if (remove_dir_recursively(&temp_dir, 0, 0))
 		warning ("Could not remove temporary directory %s.",
 				temp_dir.buf);
 
