@@ -800,7 +800,7 @@ int is_empty_dir(const char *path)
 	return ret;
 }
 
-int remove_dir_recursively(struct strbuf *path, int only_empty)
+int remove_dir_recursively(struct strbuf *path, int only_empty, int keep_dot_git)
 {
 	DIR *dir = opendir(path->buf);
 	struct dirent *e;
@@ -812,6 +812,19 @@ int remove_dir_recursively(struct strbuf *path, int only_empty)
 		strbuf_addch(path, '/');
 
 	len = path->len;
+
+	if (keep_dot_git) {
+		char end_of_path[6]; /* enough space for ".git/"*/
+		memset(end_of_path, '\0', 6);
+		if (len >= 5) {
+			strncpy(end_of_path, path->buf + len - 5, 5);
+			if (strcmp(end_of_path, ".git/") == 0) {
+				warning("not removing %s", dir); 
+				return 0;
+			}
+		}
+	}
+
 	while ((e = readdir(dir)) != NULL) {
 		struct stat st;
 		if (is_dot_or_dotdot(e->d_name))
@@ -822,7 +835,7 @@ int remove_dir_recursively(struct strbuf *path, int only_empty)
 		if (lstat(path->buf, &st))
 			; /* fall thru */
 		else if (S_ISDIR(st.st_mode)) {
-			if (!remove_dir_recursively(path, only_empty))
+			if (!remove_dir_recursively(path, only_empty, keep_dot_git))
 				continue; /* happy */
 		} else if (!only_empty && !unlink(path->buf))
 			continue; /* happy, too */

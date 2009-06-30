@@ -141,7 +141,7 @@ int cmd_clean(int argc, const char **argv, const char *prefix)
 				   (matches == MATCHED_EXACTLY)) {
 				if (!quiet)
 					printf("Removing %s\n", qname);
-				if (remove_dir_recursively(&directory, 0) != 0) {
+				if (remove_dir_recursively(&directory, 0, 0) != 0) {
 					warning("failed to remove '%s'", qname);
 					errors++;
 				}
