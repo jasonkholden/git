@@ -813,22 +813,23 @@ int remove_dir_recursively(struct strbuf *path, int only_empty, int keep_dot_git
 
 	len = path->len;
 
-	if (keep_dot_git) {
-		char end_of_path[6]; /* enough space for ".git/"*/
-		memset(end_of_path, '\0', 6);
-		if (len >= 5) {
-			strncpy(end_of_path, path->buf + len - 5, 5);
-			if (strcmp(end_of_path, ".git/") == 0) {
-				warning("not removing %s", dir); 
-				return 0;
-			}
-		}
-	}
-
 	while ((e = readdir(dir)) != NULL) {
 		struct stat st;
 		if (is_dot_or_dotdot(e->d_name))
 			continue;
+
+		if (keep_dot_git) {
+			char end_of_path[6]; /* enough space for ".git/"*/
+			memset(end_of_path, '\0', 6);
+			if (len >= 5) {
+				strncpy(end_of_path, path->buf + len - 5, 5);
+				if (strcmp(end_of_path, ".git/") == 0) {
+					warning("not removing %s", dir); 
+					return 0;
+				}
+			}
+		}
+
 
 		strbuf_setlen(path, len);
 		strbuf_addstr(path, e->d_name);
