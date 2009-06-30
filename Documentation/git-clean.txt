@@ -8,7 +8,7 @@ git-clean - Remove untracked files from the working tree
 SYNOPSIS
 --------
 [verse]
-'git clean' [-d] [-f] [-n] [-q] [-x | -X] [--] <path>...
+'git clean' [-d] [-f] [-n] [-q] [-m] [-x | -X] [--] <path>...
 
 DESCRIPTION
 -----------
@@ -40,6 +40,10 @@ OPTIONS
 --quiet::
 	Be quiet, only report errors, but not the files that are
 	successfully removed.
+
+-m::
+	Clean any .git directories that may be left-over, untracked
+	submodules.
 
 -x::
 	Don't use the ignore rules.  This allows removing all untracked
