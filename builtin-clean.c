@@ -15,7 +15,7 @@
 static int force = -1; /* unset */
 
 static const char *const builtin_clean_usage[] = {
-	"git clean [-d] [-f] [-n] [-q] [-x | -X] [--] <paths>...",
+	"git clean [-d] [-f] [-n] [-q] [-m] [-x | -X] [--] <paths>...",
 	NULL
 };
 
@@ -31,6 +31,7 @@ int cmd_clean(int argc, const char **argv, const char *prefix)
 	int i;
 	int show_only = 0, remove_directories = 0, quiet = 0, ignored = 0;
 	int ignored_only = 0, baselen = 0, config_set = 0, errors = 0;
+	int rm_untracked_submodules = 0;
 	struct strbuf directory = STRBUF_INIT;
 	struct dir_struct dir;
 	const char *path, *base;
@@ -44,6 +45,8 @@ int cmd_clean(int argc, const char **argv, const char *prefix)
 		OPT_BOOLEAN('f', NULL, &force, "force"),
 		OPT_BOOLEAN('d', NULL, &remove_directories,
 				"remove whole directories"),
+		OPT_BOOLEAN('m', NULL, &rm_untracked_submodules,
+				"remove untracked submodules"),
 		OPT_BOOLEAN('x', NULL, &ignored, "remove ignored files, too"),
 		OPT_BOOLEAN('X', NULL, &ignored_only,
 				"remove only ignored files"),
@@ -58,6 +61,14 @@ int cmd_clean(int argc, const char **argv, const char *prefix)
 
 	argc = parse_options(argc, argv, prefix, options, builtin_clean_usage,
 			     0);
+
+
+	int keep_dot_git = 0;
+	if (rm_untracked_submodules == 0)
+		keep_dot_git = 1;
+	else
+		printf("Any untracked .git directories will be deleted (abandoned submodules)\n");
+
 
 	memset(&dir, 0, sizeof(dir));
 	if (ignored_only)
@@ -141,7 +152,7 @@ int cmd_clean(int argc, const char **argv, const char *prefix)
 				   (matches == MATCHED_EXACTLY)) {
 				if (!quiet)
 					printf("Removing %s\n", qname);
-				if (remove_dir_recursively(&directory, 0, 0) != 0) {
+				if (remove_dir_recursively(&directory, 0, keep_dot_git) != 0) {
 					warning("failed to remove '%s'", qname);
 					errors++;
 				}
