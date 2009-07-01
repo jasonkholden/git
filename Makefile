@@ -226,7 +226,7 @@ STRIP ?= strip
 # runtime figures out where they are based on the path to the executable.
 # This can help installing the suite in a relocatable way.
 
-prefix = $(HOME)
+prefix = /disk2/git_projects/git/output
 bindir_relative = bin
 bindir = $(prefix)/$(bindir_relative)
 mandir = share/man
