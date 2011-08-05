@@ -2497,6 +2497,7 @@ proc makewindow {} {
 	{mc "Return to mark" command gotomark}
 	{mc "Find descendant of this and mark" command find_common_desc}
 	{mc "Compare with marked commit" command compare_commits}
+	{mc "Visualize this merge" command visualize_merge}
     }
     $rowctxmenu configure -tearoff 0
 
@@ -2532,6 +2533,32 @@ proc makewindow {} {
 	{mc "Run git gui blame on this line" command {external_blame_diff}}
     }
     $diff_menu configure -tearoff 0
+}
+
+# Command used when user is trying to visualize a merge commit
+proc get_id_numparents {id} {
+    global parentlist
+    set row [rowofcommit $id]
+    return [llength [lindex $parentlist $row]]
+}
+
+proc visualize_merge {} {
+    global parents currentid parentlist
+    global rowmenuid
+
+    set num_parents [get_id_numparents $rowmenuid]
+    set row [rowofcommit $rowmenuid]
+
+    if {$num_parents >= 2} {
+	set revlist $rowmenuid
+	for { set i 1 } {$i < $num_parents} {incr i} {
+
+	    set revlist "$revlist [lindex $parentlist $row 0]..[lindex $parentlist $row $i] $rowmenuid"
+	}
+	set cmd "gitk $revlist"
+	puts $cmd
+	eval exec "$cmd"
+    }
 }
 
 # Windows sends all mouse wheel events to the current focused window, not
@@ -8432,6 +8459,14 @@ proc rowmenu {x y id} {
 	} else {
 	    $menu entryconfigure 7 -label [mc "Detached head: can't reset" $mainhead] -state disabled
 	}
+
+	# Disable visualize-merge on only one parent
+	if {[get_id_numparents $id] == 1} {
+	    $menu entryconfigure 12 -state disabled
+	} else {
+	    $menu entryconfigure 12 -state normal
+	}
+
 	if {[info exists markedid] && $markedid ne $id} {
 	    $menu entryconfigure 9 -state normal
 	    $menu entryconfigure 10 -state normal
