@@ -2523,6 +2523,7 @@ proc makewindow {} {
 	{mc "Highlight this only" command {flist_hl 1}}
 	{mc "External diff" command {external_diff}}
 	{mc "Blame parent commit" command {external_blame 1}}
+	{mc "Visualize file history" command {visualize_file}}
     }
     $flist_menu configure -tearoff 0
 
@@ -3583,6 +3584,15 @@ proc make_relative {f} {
     }
     set elts [concat $res [lrange $elts $ei end]]
     return [eval file join $elts]
+}
+
+proc visualize_file {} {
+    global flist_menu_file gitdir
+    set f [file join [file dirname $gitdir] $flist_menu_file]
+
+    # How do we want to handle files that have been moved?
+    # Just adding --follow to the command line below seems sub-optimal
+    eval exec gitk $f
 }
 
 proc external_blame {parent_idx {line {}}} {
