@@ -2441,6 +2441,8 @@ proc makewindow {} {
     bindkey k "selnextline 1"
     bindkey a "sel_parent_cmt l"
     bindkey s "sel_parent_cmt r"
+    bindkey A "goback"
+    bindkey S "goback"
     bindkey j "goback"
     bindkey l "goforw"
     bindkey b prevfile
