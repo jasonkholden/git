@@ -2439,6 +2439,8 @@ proc makewindow {} {
     bindkey x "goforw"
     bindkey i "selnextline -1"
     bindkey k "selnextline 1"
+    bindkey a "sel_parent_cmt l"
+    bindkey s "sel_parent_cmt r"
     bindkey j "goback"
     bindkey l "goforw"
     bindkey b prevfile
@@ -2534,6 +2536,26 @@ proc makewindow {} {
 	{mc "Run git gui blame on this line" command {external_blame_diff}}
     }
     $diff_menu configure -tearoff 0
+}
+
+
+proc sel_parent_cmt {side} {
+    global parentlist selectedline currentid
+
+    if {$selectedline eq {}} {
+	return
+    }
+
+    set num_parents [get_id_numparents $currentid]
+    if {$num_parents > 1 && $side == "r"} {
+	set parent_idx 1
+    } else {
+	set parent_idx 0
+    }
+    set rparen [lindex $parentlist $selectedline $parent_idx]
+    set row [rowofcommit $rparen]
+    selectline $row 1
+
 }
 
 # Command used when user is trying to visualize a merge commit
