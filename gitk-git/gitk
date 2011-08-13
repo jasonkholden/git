@@ -2498,6 +2498,7 @@ proc makewindow {} {
 	{mc "Find descendant of this and mark" command find_common_desc}
 	{mc "Compare with marked commit" command compare_commits}
 	{mc "Visualize this merge" command visualize_merge}
+	{mc "Visualize mark to here" command visualize_mark}
     }
     $rowctxmenu configure -tearoff 0
 
@@ -2561,6 +2562,15 @@ proc visualize_merge {} {
 	eval exec "$cmd"
     }
 }
+
+proc visualize_mark {} {
+    global markedid rowmenuid
+    if {[info exists markedid] && $markedid ne $rowmenuid} {
+	set cmd "gitk $markedid...$rowmenuid"
+	eval exec "$cmd"
+    }
+}
+
 
 # Windows sends all mouse wheel events to the current focused window, not
 # the one where the mouse hovers, so bind those events here and redirect
@@ -8481,10 +8491,12 @@ proc rowmenu {x y id} {
 	    $menu entryconfigure 9 -state normal
 	    $menu entryconfigure 10 -state normal
 	    $menu entryconfigure 11 -state normal
+	    $menu entryconfigure 13 -state normal
 	} else {
 	    $menu entryconfigure 9 -state disabled
 	    $menu entryconfigure 10 -state disabled
 	    $menu entryconfigure 11 -state disabled
+	    $menu entryconfigure 13 -state disabled
 	}
     } else {
 	set menu $fakerowmenu
